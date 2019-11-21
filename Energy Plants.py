@@ -14,7 +14,7 @@ from entropica_qaoa.utilities import distances_dataset
 from scipy.spatial.distance import pdist
 import geopy.distance
 
-dataset = pd.read_csv('C:/Users/Saad Mufti/OneDrive/QC Focus/EnergyAccessDataset.csv', encoding='ANSI')
+dataset = pd.read_csv('C:/Users/Saad Mufti/Documents/GitHub/Energy-Plant-Locations-Quantum-Optimization/EnergyAccessDataset.csv', encoding='ANSI')
 dataset = dataset.set_index('Sr_ no_')
 dataset = dataset.drop_duplicates(subset='GPS')
 #TODO: Use bigger dataset instead so can get trues and falses. Then apply algo
