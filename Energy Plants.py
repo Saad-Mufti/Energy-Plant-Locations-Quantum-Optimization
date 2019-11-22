@@ -23,34 +23,23 @@ without_elec = without_elec.drop_duplicates(subset='GPS')
 print(without_elec)
 
 dataset = dataset.drop_duplicates(subset='GPS') 
-# dataset = dataset[['GPS', 'ES3']]
 dataset.append(without_elec)
 
 print('Dataset has', len(dataset))
 
-#TODO: Use bigger dataset instead so can get trues and falses. Then apply algo
-
-# bools[['Elec_access']] = dataset[['ES3']] != 7 
-# print(bools)
-# print(bools.loc[bools['Elec_access'] == False])
 bools = list(without_elec['Elec_access'])
 dataset = dataset[['GPS']]
-# print(bools)
 dataset_sample = pd.concat([without_elec[['GPS']], dataset.sample(8)])
 print(dataset_sample)
-# dataset_sample = dataset_sample[['GPS']]
 dataset_sample[['Latitude', 'Longitude']] = dataset_sample['GPS'].str.split(',', expand=True)
 dataset_sample = dataset_sample.drop(['GPS'], axis=1)
 print(dataset_sample)
 
 distance_matrix = np.array(dataset_sample[['Latitude', 'Longitude']])
-# print(distance_matrix)
-# print(m_dist)
 
 dist = pd.DataFrame(distances_dataset(dataset_sample.values, 
                                     lambda u, v: geopy.distance.distance(u, v).kilometers), index=dataset_sample.index, columns=dataset_sample.index)
 print(dist)
-# print(dist.iloc[0,:])
 
 hamiltonian = hamiltonian_from_distances(dist)
 timesteps = 3
@@ -59,7 +48,6 @@ n_qubits = 16
 betas = [round(val,1) for val in np.random.rand(timesteps*n_qubits)]
 gammas_singles = [round(val,1) for val in np.random.rand(0)] 
 gammas_pairs = [round(val,1) for val in np.random.rand(timesteps*len(hamiltonian))]
-
 
 hyperparameters = (hamiltonian, timesteps)
 parameters = (betas, gammas_singles, gammas_pairs)
@@ -71,8 +59,6 @@ cost_function = QAOACostFunctionOnWFSim(hamiltonian,
                                         params=params,
                                         sim=sim,
                                         enable_logging=True)
-
-
 
 def run_qaoa(hamiltonian, params, timesteps, max_iters, init_state=None):
     cost_function = QAOACostFunctionOnWFSim(hamiltonian,
