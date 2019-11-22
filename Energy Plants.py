@@ -17,8 +17,8 @@ import geopy.distance
 dataset = pd.read_csv('C:/Users/Saad Mufti/Documents/GitHub/Energy-Plant-Locations-Quantum-Optimization/EnergyAccessSurveyFull.csv', low_memory=False, encoding='ANSI')
 dataset = dataset.set_index('Sr_ no_')
 dataset = dataset[['GPS', 'ES3']]
-dataset[['Elec_access']] = dataset[['ES3']] != 7 
-without_elec = dataset.loc[dataset['Elec_access'] == False] 
+dataset[['Elec_access']] = dataset[['ES3']] == 7 
+without_elec = dataset.loc[dataset['Elec_access'] == True] 
 without_elec = without_elec.drop_duplicates(subset='GPS')
 print(without_elec)
 
@@ -55,7 +55,7 @@ print(dist)
 hamiltonian = hamiltonian_from_distances(dist)
 timesteps = 3
 iterations = 500
-n_qubits = 16 #10
+n_qubits = 16 
 betas = [round(val,1) for val in np.random.rand(timesteps*n_qubits)]
 gammas_singles = [round(val,1) for val in np.random.rand(0)] 
 gammas_pairs = [round(val,1) for val in np.random.rand(timesteps*len(hamiltonian))]
@@ -72,10 +72,7 @@ cost_function = QAOACostFunctionOnWFSim(hamiltonian,
                                         sim=sim,
                                         enable_logging=True)
 
-t0 = time.time()
 
-
-print('Run complete!\n','Runtime:','{:.3f}'.format(time.time()-t0))
 
 def run_qaoa(hamiltonian, params, timesteps, max_iters, init_state=None):
     cost_function = QAOACostFunctionOnWFSim(hamiltonian,
@@ -86,12 +83,14 @@ def run_qaoa(hamiltonian, params, timesteps, max_iters, init_state=None):
 
     return cost_function.get_wavefunction(params.raw()), res
 
-wave_func, res = run_qaoa(hamiltonian, params, timesteps=3, max_iters=1500)
+t0 = time.time()
+wave_func, res = run_qaoa(hamiltonian, params, timesteps=3, max_iters=2500)
 
+print('Run complete!\n','Runtime:','{:.3f}'.format(time.time()-t0))
 wave_func = cost_function.get_wavefunction(params.raw())
 lowest = max_probability_bitstring(wave_func.probabilities())
 
 true_clusters = [1 if val else 0 for val in bools]
-acc = cluster_accuracy(lowest,true_clusters)
+print(cluster_accuracy(lowest,true_clusters))
 
 print(res)
