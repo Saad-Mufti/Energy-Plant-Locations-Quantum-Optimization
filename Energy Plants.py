@@ -1,5 +1,5 @@
 import pandas as pd
-# import networkx as nx
+import networkx as nx
 from pyquil.api import WavefunctionSimulator
 from pyquil.paulis import PauliSum, PauliTerm
 from entropica_qaoa.utilities import hamiltonian_from_distances
@@ -11,6 +11,8 @@ import numpy as np
 from math import log
 from entropica_qaoa.utilities import cluster_accuracy, max_probability_bitstring
 from entropica_qaoa.utilities import distances_dataset
+from entropica_qaoa.utilities import graph_from_hamiltonian
+from entropica_qaoa.utilities import plot_graph
 from scipy.spatial.distance import pdist
 import geopy.distance
 
@@ -42,6 +44,9 @@ dist = pd.DataFrame(distances_dataset(dataset_sample.values,
 print(dist)
 
 hamiltonian = hamiltonian_from_distances(dist)
+G = graph_from_hamiltonian(hamiltonian)
+plot_graph(G)
+# nx.draw(G)
 timesteps = 3
 iterations = 500
 n_qubits = 16 
@@ -70,13 +75,14 @@ def run_qaoa(hamiltonian, params, timesteps, max_iters, init_state=None):
     return cost_function.get_wavefunction(params.raw()), res
 
 t0 = time.time()
-wave_func, res = run_qaoa(hamiltonian, params, timesteps=3, max_iters=2500)
+wave_func, res = run_qaoa(hamiltonian, params, timesteps=3, max_iters=4500)
 
 print('Run complete!\n','Runtime:','{:.3f}'.format(time.time()-t0))
+t0 = time.time()
 wave_func = cost_function.get_wavefunction(params.raw())
 lowest = max_probability_bitstring(wave_func.probabilities())
 
 true_clusters = [1 if val else 0 for val in bools]
 print(cluster_accuracy(lowest,true_clusters))
-
+print('Full Run complete!\n','Runtime:','{:.3f}'.format(time.time()-t0))
 print(res)
